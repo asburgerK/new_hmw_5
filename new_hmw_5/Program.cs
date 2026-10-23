@@ -8,11 +8,19 @@ class Program
 
         string text = args[0].ToLower();
         const string vowels = "euioay";
+
+
+        LinkedList<char> list = new LinkedList<char>();
+        foreach (char c in text)
+            list.AddLast(c);
+
         int vowelSum = 0, consonantSum = 0;
 
-        foreach (char c in text)
+        
+        for (LinkedListNode<char> node = list.First; node != null; node = node.Next)
         {
-            if (c < 'a' || c > 'z') continue;   
+            char c = node.Value;
+            if (c < 'a' || c > 'z') continue;
             if (vowels.Contains(c)) vowelSum++;
             else consonantSum++;
         }
