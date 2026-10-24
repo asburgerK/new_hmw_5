@@ -1,34 +1,54 @@
 ﻿using System;
-using System.Net.NetworkInformation;
-using System.Numerics;
+using System.Collections.Generic;
 
 struct Program
 {
-
     static void Main()
     {
         Random rnd = new Random();
-        int[,] temperature = new int[12, 30];
 
-        for (int i = 0; i < temperature.GetLength(0); i++)
+        string[] monthNames =
         {
-            for (int j = 0; j < temperature.GetLength(1); j++)
+            "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+            "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+        };
+
+        Dictionary<string, int[]> temperature = new Dictionary<string, int[]>();
+
+        foreach (string month in monthNames)
+        {
+            int[] monthTemps = new int[30];
+            for (int j = 0; j < monthTemps.Length; j++)
             {
-                temperature[i, j] = rnd.Next(-20, 30);
+                monthTemps[j] = rnd.Next(-20, 30);
             }
+            temperature[month] = monthTemps; // добавление по ключу
         }
 
-        double[] mediumTemperature = new double[12];
-        for (int i = 0; i < mediumTemperature.Length; i++)
+        Dictionary<string, double> mediumTemperature = new Dictionary<string, double>();
+
+        foreach (KeyValuePair<string, int[]> pair in temperature)
         {
             double sum = 0;
-            for (int j = 0; j < temperature.GetLength(1); j++)
+            int[] monthTemps = pair.Value;
+            for (int j = 0; j < monthTemps.Length; j++)
             {
-                sum += temperature[i, j];
+                sum += monthTemps[j];
             }
-            mediumTemperature[i] = sum / temperature.GetLength(1);
+            mediumTemperature[pair.Key] = sum / monthTemps.Length;
         }
-        Array.Sort(mediumTemperature);
-    }
 
+        
+        List<KeyValuePair<string, double>> sortedList =
+            new List<KeyValuePair<string, double>>(mediumTemperature);
+
+        sortedList.Sort((a, b) => a.Value.CompareTo(b.Value));
+
+        
+;
+        foreach (KeyValuePair<string, double> pair in sortedList)
+        {
+            Console.WriteLine($"{pair.Key} : {pair.Value}");
+        }
+    }
 }
