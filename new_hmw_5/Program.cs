@@ -1,54 +1,89 @@
 ﻿using System;
-using System.Net.NetworkInformation;
-using System.Numerics;
+using System.Collections.Generic;
 
 struct Program
 {
-
-    static void print(int[,] a)
+    static void Print(LinkedList<LinkedList<int>> matrix)
     {
-        for (int i = 0; i < a.GetLength(0); i++)
+        foreach (var row in matrix)
         {
-            for (int j = 0; j < a.GetLength(1); j++)
+            foreach (var item in row)
             {
-                Console.Write(a[i, j] + " ");
+                Console.Write(item + " ");
             }
             Console.WriteLine();
         }
     }
 
-    static int[,] Multiply(int[,] a, int[,] b)
+    static LinkedList<LinkedList<int>> Multiply(
+        LinkedList<LinkedList<int>> a,
+        LinkedList<LinkedList<int>> b)
     {
+        int rowsA = a.Count;
+        int colsA = a.First.Value.Count;
+        int rowsB = b.Count;
+        int colsB = b.First.Value.Count;
 
-        int[,] c = new int[a.GetLength(0), b.GetLength(1)];
-        if(a.GetLength(1) != b.GetLength(0) )
+        if (colsA != rowsB)
         {
             throw new ArgumentException("Несовместимые размеры матриц.");
         }
-        for (int i = 0; i < a.GetLength(0); i++)
+
+        // Преобразуем b в массив столбцов для быстрого доступа
+        // (в LinkedList нет индексатора, поэтому удобнее подготовить данные)
+        int[][] bRows = new int[rowsB][];
+        int r = 0;
+        foreach (var row in b)
         {
-            for (int j = 0; j < b.GetLength(1); j++)
+            bRows[r] = new int[colsB];
+            int c = 0;
+            foreach (var val in row)
             {
-                c[i, j] = 0;
-                for (int k = 0; k < a.GetLength(1); k++)
-                {
-                    c[i, j] += a[i, k] * b[k, j];
-                }
+                bRows[r][c++] = val;
             }
+            r++;
         }
 
-        return c;
+        var result = new LinkedList<LinkedList<int>>();
 
-
-
-
-        static void Main()
+        foreach (var rowA in a)
         {
-            int[,] a = { { 1, 2 }, { 3, 4 } };
-            int[,] b = { { 5, 6 }, { 7, 8 } };
-
-            int[,] c = Multiply(a, b);
-            print(c);
+            var newRow = new LinkedList<int>();
+            for (int j = 0; j < colsB; j++)
+            {
+                int sum = 0;
+                int k = 0;
+                foreach (var valA in rowA)
+                {
+                    sum += valA * bRows[k][j];
+                    k++;
+                }
+                newRow.AddLast(sum);
+            }
+            result.AddLast(newRow);
         }
+
+        return result;
+    }
+
+    static LinkedList<int> MakeRow(params int[] values)
+    {
+        var row = new LinkedList<int>();
+        foreach (var v in values) row.AddLast(v);
+        return row;
+    }
+
+    static void Main()
+    {
+        var a = new LinkedList<LinkedList<int>>();
+        a.AddLast(MakeRow(1, 2));
+        a.AddLast(MakeRow(3, 4));
+
+        var b = new LinkedList<LinkedList<int>>();
+        b.AddLast(MakeRow(5, 6));
+        b.AddLast(MakeRow(7, 8));
+
+        var c = Multiply(a, b);
+        Print(c);
     }
 }
